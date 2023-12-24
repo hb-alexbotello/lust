@@ -1,11 +1,11 @@
-use bytes::Bytes;
-use enum_dispatch::enum_dispatch;
 use crate::config::ImageKind;
 use crate::pipelines::PipelineResult;
+use bytes::Bytes;
+use enum_dispatch::enum_dispatch;
 
-use super::realtime::RealtimePipeline;
 use super::aot::AheadOfTimePipeline;
 use super::jit::JustInTimePipeline;
+use super::realtime::RealtimePipeline;
 
 /// Pipelines are dynamically selected here.
 ///
@@ -22,7 +22,11 @@ pub enum PipelineSelector {
 
 #[enum_dispatch]
 pub trait Pipeline: Sync + Send + 'static {
-    fn on_upload(&self, kind: ImageKind, data: Vec<u8>) -> anyhow::Result<PipelineResult>;
+    fn on_upload(
+        &self,
+        kind: ImageKind,
+        data: Vec<u8>,
+    ) -> anyhow::Result<PipelineResult>;
 
     fn on_fetch(
         &self,
@@ -33,3 +37,4 @@ pub trait Pipeline: Sync + Send + 'static {
         custom_size: Option<(u32, u32)>,
     ) -> anyhow::Result<PipelineResult>;
 }
+

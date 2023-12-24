@@ -1,6 +1,6 @@
+use serde::Deserialize;
 use std::path::PathBuf;
 use std::sync::Arc;
-use serde::Deserialize;
 
 use crate::StorageBackend;
 
@@ -31,15 +31,15 @@ pub enum BackendConfigs {
         #[serde(default)]
         /// Store objects with the `public-read` acl.
         store_public: bool,
-    }
+    },
 }
 
 impl BackendConfigs {
     pub async fn connect(&self) -> anyhow::Result<Arc<dyn StorageBackend>> {
         match self {
-            Self::FileSystem { directory } => {
-                Ok(Arc::new(super::filesystem::FileSystemBackend::new(directory.clone())))
-            },
+            Self::FileSystem { directory } => Ok(Arc::new(
+                super::filesystem::FileSystemBackend::new(directory.clone()),
+            )),
             Self::BlobStorage {
                 name,
                 region,
@@ -68,10 +68,11 @@ impl BackendConfigs {
                     nodes,
                     username.clone(),
                     password.clone(),
-                ).await?;
+                )
+                .await?;
 
                 Ok(Arc::new(backend))
-            }
+            },
         }
     }
 }
