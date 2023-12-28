@@ -32,6 +32,12 @@ pub enum BackendConfigs {
         /// Store objects with the `public-read` acl.
         store_public: bool,
     },
+    GCPCloudStorage {
+        /// The name of the bucket.
+        name: String,
+        /// The path to the service account json file.
+        service_account_path: String,
+    },
 }
 
 impl BackendConfigs {
@@ -52,6 +58,18 @@ impl BackendConfigs {
                     endpoint.to_string(),
                     *store_public,
                 )?;
+
+                Ok(Arc::new(backend))
+            },
+            Self::GCPCloudStorage {
+                name,
+                service_account_path,
+            } => {
+                let backend = super::gcp_cloud_storage::GCPCloudStorageBackend::new(
+                    name.to_string(),
+                    service_account_path.to_string(),
+                )
+                .await?;
 
                 Ok(Arc::new(backend))
             },
