@@ -36,7 +36,7 @@ pub enum BackendConfigs {
         /// The name of the bucket.
         name: String,
         /// The path to the service account json file.
-        service_account_path: String,
+        service_account: String,
     },
 }
 
@@ -63,11 +63,11 @@ impl BackendConfigs {
             },
             Self::GCPCloudStorage {
                 name,
-                service_account_path,
+                service_account,
             } => {
                 let backend = super::gcp_cloud_storage::GCPCloudStorageBackend::new(
                     name.to_string(),
-                    service_account_path.to_string(),
+                    service_account.to_string(),
                 )
                 .await?;
 

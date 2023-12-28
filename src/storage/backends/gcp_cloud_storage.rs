@@ -14,10 +14,10 @@ pub struct GCPCloudStorageBackend {
 impl GCPCloudStorageBackend {
     pub async fn new(
         bucket_name: String,
-        service_account_path: String,
+        service_account: String,
     ) -> anyhow::Result<Self> {
         // the cloud_storage crate requires the SERVICE_ACCOUNT env var to be set
-        std::env::set_var("SERVICE_ACCOUNT", &service_account_path);
+        std::env::set_var("SERVICE_ACCOUNT", &service_account);
 
         // read from the bucket to ensure we're authenticated
         // and that the chosen bucket exists
