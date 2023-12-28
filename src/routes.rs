@@ -6,7 +6,6 @@ use poem_openapi::payload::{Binary, Json};
 use poem_openapi::OpenApi;
 use poem_openapi::{ApiResponse, Object};
 use std::fmt::Display;
-use uuid::Uuid;
 
 use crate::config::{config, ImageKind};
 use crate::controller::{get_bucket_by_name, BucketController, UploadInfo};
@@ -90,7 +89,7 @@ impl FetchResponse {
         Self::NotFound(Json(detail))
     }
 
-    fn image_not_found(image_id: Uuid) -> Self {
+    fn image_not_found(image_id: String) -> Self {
         let detail = Detail {
             detail: format!("The image {:?} does not exist in bucket.", image_id),
         };
@@ -204,7 +203,7 @@ impl LustApi {
         bucket: Path<String>,
 
         /// The id of the image.
-        image_id: Path<Uuid>,
+        image_id: Path<String>,
 
         /// The encoding format that the image should be returned as.
         format: Query<Option<ImageKind>>,
@@ -247,7 +246,7 @@ impl LustApi {
         };
 
         let img = bucket
-            .fetch(image_id.0, kind, size.0, custom_sizing)
+            .fetch(&image_id.0, kind, size.0, custom_sizing)
             .await?;
         match img {
             None => Ok(FetchResponse::image_not_found(image_id.0)),
@@ -271,14 +270,14 @@ impl LustApi {
         bucket: Path<String>,
 
         /// The image to delete try delete.
-        image_id: Path<Uuid>,
+        image_id: Path<String>,
     ) -> Result<DeleteResponse> {
         let bucket = match get_bucket_by_name(&*bucket) {
             None => return Ok(DeleteResponse::NotFound),
             Some(b) => b,
         };
 
-        bucket.delete(*image_id).await?;
+        bucket.delete(&image_id).await?;
 
         Ok(DeleteResponse::Ok)
     }

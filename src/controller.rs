@@ -6,7 +6,6 @@ use std::hash::Hash;
 use std::sync::Arc;
 use std::time::Instant;
 use tokio::sync::{Semaphore, SemaphorePermit};
-use uuid::Uuid;
 
 use crate::config::{BucketConfig, ImageKind};
 use crate::pipelines::{PipelineController, ProcessingMode, StoreEntry};
@@ -56,7 +55,7 @@ pub struct UploadInfo {
     /// The generated ID for the file.
     ///
     /// This can be used to access the file for the given bucket.
-    image_id: Uuid,
+    image_id: String,
 
     /// The time spent processing the image in seconds.
     processing_time: f32,
@@ -127,15 +126,16 @@ impl BucketController {
 
         let processing_start = Instant::now();
         let checksum = crc32fast::hash(&data);
+        let image_id = crate::utils::sha256_hash(&data);
+
         let pipeline = self.pipeline.clone();
         let result = tokio::task::spawn_blocking(move || pipeline.on_upload(kind, data))
             .await??;
         let processing_time = processing_start.elapsed();
 
-        let image_id = Uuid::new_v4();
         let io_start = Instant::now();
         let image_upload_info = self
-            .concurrent_upload(image_id, result.result.to_store)
+            .concurrent_upload(image_id.to_string(), result.result.to_store)
             .await?;
         let io_time = io_start.elapsed();
 
@@ -151,7 +151,7 @@ impl BucketController {
 
     pub async fn fetch(
         &self,
-        image_id: Uuid,
+        image_id: &str,
         desired_kind: ImageKind,
         size_preset: Option<String>,
         custom_sizing: Option<(u32, u32)>,
@@ -236,13 +236,13 @@ impl BucketController {
         })
         .await??;
 
-        self.concurrent_upload(image_id, result.result.to_store)
+        self.concurrent_upload(image_id.to_string(), result.result.to_store)
             .await?;
 
         Ok(result.result.response)
     }
 
-    pub async fn delete(&self, image_id: Uuid) -> anyhow::Result<()> {
+    pub async fn delete(&self, image_id: &str) -> anyhow::Result<()> {
         debug!("Removing image {}", image_id);
 
         let _permit = get_optional_permit(&self.global_limiter, &self.limiter).await?;
@@ -261,7 +261,7 @@ impl BucketController {
 
 impl BucketController {
     #[inline]
-    fn cache_key(&self, sizing_id: u32, image_id: Uuid, kind: ImageKind) -> String {
+    fn cache_key(&self, sizing_id: u32, image_id: &str, kind: ImageKind) -> String {
         format!(
             "{bucket}:{sizing}:{image}:{kind}",
             bucket = self.bucket_id,
@@ -273,7 +273,7 @@ impl BucketController {
 
     async fn caching_fetch(
         &self,
-        image_id: Uuid,
+        image_id: &str,
         fetch_kind: ImageKind,
         sizing_id: u32,
     ) -> anyhow::Result<Option<Bytes>> {
@@ -307,7 +307,7 @@ impl BucketController {
 
     async fn concurrent_upload(
         &self,
-        image_id: Uuid,
+        image_id: String,
         to_store: Vec<StoreEntry>,
     ) -> anyhow::Result<Vec<ImageUploadInfo>> {
         let mut image_upload_info = vec![];
@@ -319,14 +319,15 @@ impl BucketController {
             let storage = self.storage.clone();
             let bucket_id = self.bucket_id;
             let cache = self.cache.clone();
+            let image_id = image_id.clone();
             let cache_key =
-                self.cache_key(store_entry.sizing_id, image_id, store_entry.kind);
+                self.cache_key(store_entry.sizing_id, &image_id, store_entry.kind);
 
             let t = tokio::spawn(async move {
                 storage
                     .store(
                         bucket_id,
-                        image_id,
+                        &image_id,
                         store_entry.kind,
                         store_entry.sizing_id,
                         store_entry.data.clone(),

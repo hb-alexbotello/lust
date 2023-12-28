@@ -5,7 +5,6 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use bytes::Bytes;
 use scylla::IntoTypedRows;
-use uuid::Uuid;
 
 pub struct ScyllaBackend {
     table: String,
@@ -53,7 +52,7 @@ impl StorageBackend for ScyllaBackend {
     async fn store(
         &self,
         bucket_id: u32,
-        image_id: Uuid,
+        image_id: &str,
         kind: ImageKind,
         sizing_id: u32,
         data: Bytes,
@@ -79,7 +78,7 @@ impl StorageBackend for ScyllaBackend {
     async fn fetch(
         &self,
         bucket_id: u32,
-        image_id: Uuid,
+        image_id: &str,
         kind: ImageKind,
         sizing_id: u32,
     ) -> anyhow::Result<Option<Bytes>> {
@@ -110,7 +109,7 @@ impl StorageBackend for ScyllaBackend {
     async fn delete(
         &self,
         bucket_id: u32,
-        image_id: Uuid,
+        image_id: &str,
     ) -> anyhow::Result<Vec<(u32, ImageKind)>> {
         let qry = format!("DELETE FROM {table} WHERE bucket_id = ? AND image_id = ? AND kind = ? AND sizing_id = ?;", table = self.table);
 
@@ -202,4 +201,3 @@ mod session {
         }
     }
 }
-

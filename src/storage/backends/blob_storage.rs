@@ -8,7 +8,6 @@ use rusoto_s3::{
 };
 use std::time::Duration;
 use tokio::io::AsyncReadExt;
-use uuid::Uuid;
 
 use crate::config::ImageKind;
 use crate::controller::get_bucket_by_id;
@@ -62,7 +61,7 @@ impl BlobStorageBackend {
         &self,
         bucket_id: u32,
         sizing_id: u32,
-        image_id: Uuid,
+        image_id: &str,
         format: ImageKind,
     ) -> String {
         format!(
@@ -80,7 +79,7 @@ impl StorageBackend for BlobStorageBackend {
     async fn store(
         &self,
         bucket_id: u32,
-        image_id: Uuid,
+        image_id: &str,
         kind: ImageKind,
         sizing_id: u32,
         data: Bytes,
@@ -109,7 +108,7 @@ impl StorageBackend for BlobStorageBackend {
     async fn fetch(
         &self,
         bucket_id: u32,
-        image_id: Uuid,
+        image_id: &str,
         kind: ImageKind,
         sizing_id: u32,
     ) -> anyhow::Result<Option<Bytes>> {
@@ -137,7 +136,7 @@ impl StorageBackend for BlobStorageBackend {
     async fn delete(
         &self,
         bucket_id: u32,
-        image_id: Uuid,
+        image_id: &str,
     ) -> anyhow::Result<Vec<(u32, ImageKind)>> {
         let bucket = get_bucket_by_id(bucket_id)
             .ok_or_else(|| anyhow!("Bucket does not exist."))?

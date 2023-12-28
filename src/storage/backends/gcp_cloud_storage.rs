@@ -4,7 +4,6 @@ use crate::StorageBackend;
 use anyhow::anyhow;
 use async_trait::async_trait;
 use bytes::Bytes;
-use uuid::Uuid;
 
 pub struct GCPCloudStorageBackend {
     bucket_name: String,
@@ -35,7 +34,7 @@ impl GCPCloudStorageBackend {
         &self,
         bucket_id: u32,
         sizing_id: u32,
-        image_id: Uuid,
+        image_id: &str,
         format: ImageKind,
     ) -> String {
         format!(
@@ -53,7 +52,7 @@ impl StorageBackend for GCPCloudStorageBackend {
     async fn store(
         &self,
         bucket_id: u32,
-        image_id: Uuid,
+        image_id: &str,
         kind: ImageKind,
         sizing_id: u32,
         data: Bytes,
@@ -78,7 +77,7 @@ impl StorageBackend for GCPCloudStorageBackend {
     async fn fetch(
         &self,
         bucket_id: u32,
-        image_id: Uuid,
+        image_id: &str,
         kind: ImageKind,
         sizing_id: u32,
     ) -> anyhow::Result<Option<Bytes>> {
@@ -102,7 +101,7 @@ impl StorageBackend for GCPCloudStorageBackend {
     async fn delete(
         &self,
         bucket_id: u32,
-        image_id: Uuid,
+        image_id: &str,
     ) -> anyhow::Result<Vec<(u32, ImageKind)>> {
         let bucket = get_bucket_by_id(bucket_id)
             .ok_or_else(|| anyhow!("Bucket does not exist."))?
