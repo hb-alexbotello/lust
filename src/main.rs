@@ -89,13 +89,12 @@ async fn main() -> Result<()> {
         "".to_string()
     };
 
-    let api_service =
-        OpenApiService::new(routes::LustApi, "Lust API", env!("CARGO_PKG_VERSION"))
-            .description(include_str!("../description.md"))
-            .server(
-                args.docs_url
-                    .unwrap_or_else(|| format!("http://{}/v1{}", &bind, &serving_path)),
-            );
+    let api_service = OpenApiService::new(routes::LustApi, "Lust API", env!("CARGO_PKG_VERSION"))
+        .description(include_str!("../description.md"))
+        .server(
+            args.docs_url
+                .unwrap_or_else(|| format!("http://{}/v1{}", &bind, &serving_path)),
+        );
 
     let ui = api_service.redoc();
     let spec = api_service.spec();
@@ -210,7 +209,7 @@ async fn log<E: Endpoint>(next: E, req: Request) -> poem::Result<Response> {
             );
 
             Ok(resp)
-        },
+        }
         Err(e) => {
             let msg = format!("{}", &e);
             let resp = e.into_response();
@@ -229,6 +228,6 @@ async fn log<E: Endpoint>(next: E, req: Request) -> poem::Result<Response> {
             );
 
             Ok(resp)
-        },
+        }
     }
 }

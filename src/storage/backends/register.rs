@@ -60,7 +60,7 @@ impl BackendConfigs {
                 )?;
 
                 Ok(Arc::new(backend))
-            },
+            }
             Self::GCPCloudStorage {
                 name,
                 service_account,
@@ -72,7 +72,7 @@ impl BackendConfigs {
                 .await?;
 
                 Ok(Arc::new(backend))
-            },
+            }
             Self::Scylla {
                 nodes,
                 username,
@@ -90,7 +90,7 @@ impl BackendConfigs {
                 .await?;
 
                 Ok(Arc::new(backend))
-            },
+            }
         }
     }
 }

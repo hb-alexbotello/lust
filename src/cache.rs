@@ -8,7 +8,9 @@ static GLOBAL_CACHE: OnceCell<Cache> = OnceCell::new();
 
 pub fn new_cache(cfg: CacheConfig) -> anyhow::Result<Option<Cache>> {
     if cfg.max_capacity.is_some() && cfg.max_images.is_some() {
-        return Err(anyhow!("Cache must be *either* based off of number of images or amount of memory, not both."));
+        return Err(anyhow!(
+            "Cache must be *either* based off of number of images or amount of memory, not both."
+        ));
     } else if cfg.max_capacity.is_none() && cfg.max_images.is_none() {
         return Ok(None);
     }

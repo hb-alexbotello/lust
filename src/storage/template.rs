@@ -21,9 +21,6 @@ pub trait StorageBackend: Sync + Send + 'static {
         sizing_id: u32,
     ) -> anyhow::Result<Option<Bytes>>;
 
-    async fn delete(
-        &self,
-        bucket_id: u32,
-        image_id: &str,
-    ) -> anyhow::Result<Vec<(u32, ImageKind)>>;
+    async fn delete(&self, bucket_id: u32, image_id: &str)
+        -> anyhow::Result<Vec<(u32, ImageKind)>>;
 }

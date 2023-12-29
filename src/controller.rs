@@ -111,11 +111,7 @@ impl BucketController {
         &self.config
     }
 
-    pub async fn upload(
-        &self,
-        kind: ImageKind,
-        data: Vec<u8>,
-    ) -> anyhow::Result<UploadInfo> {
+    pub async fn upload(&self, kind: ImageKind, data: Vec<u8>) -> anyhow::Result<UploadInfo> {
         debug!(
             "Uploading processed image with kind: {:?} and is {} bytes in size.",
             kind,
@@ -129,8 +125,7 @@ impl BucketController {
         let image_id = crate::utils::sha256_hash(&data);
 
         let pipeline = self.pipeline.clone();
-        let result = tokio::task::spawn_blocking(move || pipeline.on_upload(kind, data))
-            .await??;
+        let result = tokio::task::spawn_blocking(move || pipeline.on_upload(kind, data)).await??;
         let processing_time = processing_start.elapsed();
 
         let io_start = Instant::now();
@@ -210,7 +205,7 @@ impl BucketController {
                 } else {
                     return Ok(None);
                 }
-            },
+            }
             Some(computed) => (computed, fetch_kind),
         };
 
@@ -226,13 +221,7 @@ impl BucketController {
 
         let pipeline = self.pipeline.clone();
         let result = tokio::task::spawn_blocking(move || {
-            pipeline.on_fetch(
-                desired_kind,
-                retrieved_kind,
-                data,
-                sizing_id,
-                custom_sizing,
-            )
+            pipeline.on_fetch(desired_kind, retrieved_kind, data, sizing_id, custom_sizing)
         })
         .await??;
 
@@ -320,8 +309,7 @@ impl BucketController {
             let bucket_id = self.bucket_id;
             let cache = self.cache.clone();
             let image_id = image_id.clone();
-            let cache_key =
-                self.cache_key(store_entry.sizing_id, &image_id, store_entry.kind);
+            let cache_key = self.cache_key(store_entry.sizing_id, &image_id, store_entry.kind);
 
             let t = tokio::spawn(async move {
                 storage

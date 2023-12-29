@@ -45,7 +45,7 @@ impl StorageBackend for FileSystemBackend {
                 tokio::fs::create_dir_all(store_in).await?;
                 tokio::fs::write(&path, data).await?;
                 Ok(())
-            },
+            }
             Err(other) => Err(other.into()),
         }
     }
@@ -81,14 +81,13 @@ impl StorageBackend for FileSystemBackend {
         for sizing_id in bucket.sizing_preset_ids().iter().copied() {
             for kind in ImageKind::variants() {
                 let store_in = self.format_path(bucket_id, sizing_id);
-                let path =
-                    store_in.join(format!("{}.{}", image_id, kind.as_file_extension()));
+                let path = store_in.join(format!("{}.{}", image_id, kind.as_file_extension()));
                 debug!("Purging image  @ {:?}", &path);
 
                 match tokio::fs::remove_file(&path).await {
                     Ok(()) => {
                         hit_entries.push((sizing_id, *kind));
-                    },
+                    }
                     Err(ref e) if e.kind() == ErrorKind::NotFound => continue,
                     Err(other) => return Err(other.into()),
                 }

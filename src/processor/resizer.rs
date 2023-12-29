@@ -14,8 +14,7 @@ pub fn resize_image_to_presets(
     kind: ImageKind,
     data: Bytes,
 ) -> anyhow::Result<Vec<ResizedImage>> {
-    let original_image =
-        Arc::new(load_from_memory_with_format(data.as_ref(), kind.into())?);
+    let original_image = Arc::new(load_from_memory_with_format(data.as_ref(), kind.into())?);
 
     let (tx, rx) = crossbeam::channel::bounded(presets.len());
     for (sizing_id, cfg) in presets {
@@ -48,4 +47,3 @@ pub fn resize_image_to_presets(
 pub fn resize(cfg: ResizingConfig, img: &DynamicImage) -> DynamicImage {
     img.resize(cfg.width, cfg.height, cfg.filter.into())
 }
-

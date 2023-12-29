@@ -35,9 +35,9 @@ pub async fn init(config_file: &Path) -> Result<()> {
             "yml" => serde_yaml::from_slice(&file)?,
             _ => {
                 return Err(anyhow!(
-                "Config file must have an extension of either `.json`,`.yaml` or `.yml`"
-            ))
-            },
+                    "Config file must have an extension of either `.json`,`.yaml` or `.yml`"
+                ))
+            }
         };
 
         validate(&cfg)?;
@@ -52,8 +52,7 @@ pub async fn init(config_file: &Path) -> Result<()> {
 
 fn validate(cfg: &RuntimeConfig) -> Result<()> {
     for (name, cfg) in cfg.buckets.iter() {
-        if !cfg.formats.png && !cfg.formats.jpeg && !cfg.formats.gif && !cfg.formats.webp
-        {
+        if !cfg.formats.png && !cfg.formats.jpeg && !cfg.formats.gif && !cfg.formats.webp {
             return Err(anyhow!(
                 "Bucket {} is invalid: At least one encoding format must be enabled.",
                 name
@@ -189,8 +188,7 @@ pub struct BucketConfig {
 impl BucketConfig {
     #[inline]
     pub fn sizing_preset_ids(&self) -> Vec<u32> {
-        let mut presets: Vec<u32> =
-            self.presets.keys().map(crate::utils::crc_hash).collect();
+        let mut presets: Vec<u32> = self.presets.keys().map(crate::utils::crc_hash).collect();
 
         if self.default_serving_preset.is_none() {
             presets.push(0);

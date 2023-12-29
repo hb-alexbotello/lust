@@ -24,11 +24,7 @@ impl JustInTimePipeline {
 }
 
 impl Pipeline for JustInTimePipeline {
-    fn on_upload(
-        &self,
-        kind: ImageKind,
-        data: Vec<u8>,
-    ) -> anyhow::Result<PipelineResult> {
+    fn on_upload(&self, kind: ImageKind, data: Vec<u8>) -> anyhow::Result<PipelineResult> {
         let webp_config = webp::config(
             self.formats.webp_config.quality.is_none(),
             self.formats.webp_config.quality.unwrap_or(50f32),
@@ -80,8 +76,7 @@ impl Pipeline for JustInTimePipeline {
             (img, 0)
         };
 
-        let encoded =
-            processor::encoder::encode_once(webp_config, desired_kind, img, sizing_id)?;
+        let encoded = processor::encoder::encode_once(webp_config, desired_kind, img, sizing_id)?;
 
         Ok(PipelineResult {
             response: Some(StoreEntry {

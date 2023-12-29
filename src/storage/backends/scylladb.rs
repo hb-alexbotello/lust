@@ -190,7 +190,7 @@ mod session {
                 Err(e) => {
                     consider_logging_error(&e);
                     Err(e)
-                },
+                }
             }
         }
     }

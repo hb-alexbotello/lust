@@ -38,9 +38,7 @@ pub fn encode_following_config(
                         buff: v,
                         sizing_id,
                     }))
-                    .expect(
-                        "Failed to respond to encoding request. Sender already closed.",
-                    );
+                    .expect("Failed to respond to encoding request. Sender already closed.");
             });
         }
     }
@@ -98,4 +96,3 @@ pub fn encode_to(
     img.write_to(&mut buff, format)?;
     Ok(Bytes::from(buff.into_inner()))
 }
-

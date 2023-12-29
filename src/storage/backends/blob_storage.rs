@@ -24,12 +24,7 @@ pub struct BlobStorageBackend {
 
 impl BlobStorageBackend {
     #[allow(clippy::too_many_arguments)]
-    pub fn new(
-        name: String,
-        region: String,
-        endpoint: String,
-        store_public: bool,
-    ) -> Result<Self> {
+    pub fn new(name: String, region: String, endpoint: String, store_public: bool) -> Result<Self> {
         let mut chain_provider = ChainProvider::new();
         chain_provider.set_timeout(Duration::from_secs(CREDENTIAL_TIMEOUT));
 

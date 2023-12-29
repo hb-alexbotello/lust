@@ -168,8 +168,7 @@ impl LustApi {
         }
 
         let format = if let Some(format) = format.0 {
-            let validate =
-                image::load_from_memory_with_format(&allocated_image, format.into());
+            let validate = image::load_from_memory_with_format(&allocated_image, format.into());
             if validate.is_err() {
                 return Ok(UploadResponse::InvalidImageFormat);
             }
@@ -236,13 +235,13 @@ impl LustApi {
                 } else {
                     Some((w, h))
                 }
-            },
+            }
             (None, None) => None,
             _ => {
                 return Ok(FetchResponse::bad_request(
                     "A custom size must include both the width and the height.",
                 ))
-            },
+            }
         };
 
         let img = bucket
@@ -303,7 +302,7 @@ fn get_image_kind(
                     .cfg()
                     .default_serving_format
                     .unwrap_or_else(|| bucket.cfg().formats.first_enabled_format())
-            },
+            }
             None => bucket
                 .cfg()
                 .default_serving_format
