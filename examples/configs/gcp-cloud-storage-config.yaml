@@ -1,0 +1,36 @@
+backend:
+  gcpcloudstorage:
+    name: "service-images-34d1"
+    service_account: "/var/config/test-sa.json"
+
+max_concurrency: 500
+base_serving_path: "/images"  # Serve buckets out of `/images`
+
+global_cache:
+  max_capacity: 1024   # We set 1 GB max cache capacity.
+
+buckets:
+  services:  # Define a bucket called "services", this is accessable out of `/images/services`.
+    mode: aot     # Optimise images as and when they're required then store them.
+    formats:
+      png: true
+      jpeg: true
+      webp: true
+      gif: false
+
+      original_image_store_format: png
+
+      webp_config:
+        quality: 80       # Set lossy quality to 80%
+        method: 4         # Opt on the side of performance slightly more than quality.
+        threading: true   # Enable multi-threaded encoding.
+
+    default_serving_format: png            # Serve the WebP format by default.
+    default_serving_preset: medium-square   # Use the "medium-square" sizing preset by default.
+
+    presets:
+      medium-square:  # Define a new resizing preset.
+        width: 500    # 500px
+        height: 500   # 500px
+
+    cache: null  # Use the global cache handler.

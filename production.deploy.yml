@@ -1,0 +1,21 @@
+services:
+  stack_caddy:
+    image: "gcr.io/the-helper-bees/bees-cdn/stack-caddy:${TAG}"
+    ports:
+      - "8335"
+    networks:
+      - localnetwork
+  
+  lust:
+    image: "gcr.io/the-helper-bees/bees-cdn/lust:${TAG}"
+    command: "-p 7337 --config-file /config.yaml"
+    ports:
+      - "7337"
+    volumes:
+      - "./configs/${ENVIRONMENT}/config.yaml:/config.yaml"
+    networks:
+      - localnetwork
+  
+networks:
+  localnetwork:
+    attachable: true

@@ -1,0 +1,7 @@
+:8335 {
+    reverse_proxy lust:7337
+}
+
+:80, :443 {
+    respond "Caddy Error: Requests should not be routed to tcp:80 nor tcp:443"
+}

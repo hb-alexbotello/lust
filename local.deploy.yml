@@ -1,0 +1,32 @@
+services:
+  stack_caddy_admin:
+    build:
+      context: .
+      dockerfile: ./compose/caddy/Dockerfile
+    container_name: stack_caddy_admin
+    ports:
+      - "8335:8335"
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    networks:
+      - localnetwork
+  
+  lust:
+    build:
+      context: .
+      dockerfile: ./compose/lust/Dockerfile
+    container_name: lust
+    command: "-p 7337 --config-file /config.yaml"
+    ports:
+      - "7337:7337"
+    volumes:
+      - "./configs/${ENVIRONMENT}/config.yaml:/config.yaml
+      - "~/.secrets/bees-cdn/test-service-account.json:/var/lust/test-sa.json"
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    networks:
+      - localnetwork
+  
+networks:
+  localnetwork:
+    attachable: true
